@@ -7,15 +7,19 @@ var is_dead: bool = false
 var target_position: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
-	# Ensure initial collision settings: Layer 1 (Mob), Mask 1 (World/Hero)
+	# Ensure initial collision settings: Layer 1 (Mob)
 	collision_layer = 1
-	collision_mask = 1
+	# Mask 1 (World/Hero) AND Mask 2 (Dead Bodies) so they don't walk through them
+	collision_mask = 3 # 1 | 2
 
 func _physics_process(_delta: float) -> void:
 	# Move towards the target position
 	var direction = global_position.direction_to(target_position)
 	velocity = direction * speed
 	move_and_slide()
+
+func set_target(new_target: Vector2) -> void:
+	target_position = new_target
 
 func take_damage(amount: int) -> void:
 	if is_dead:
@@ -31,8 +35,11 @@ func die() -> void:
 	# Change sprite color to gray to indicate death
 	modulate = Color.GRAY
 
+	# Visual polish: draw behind living mobs
+	z_index = -1
+
 	# Swap Collision Layer
-	# Alive: Layer 1, Mask 1
+	# Alive: Layer 1, Mask 3
 	# Dead: Layer 2 (Wall/Obstacle), Mask 0 (None)
 	collision_layer = 2
 	collision_mask = 0
