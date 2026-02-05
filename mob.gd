@@ -12,9 +12,8 @@ func _ready() -> void:
 
 	# Layer 1: Living Mobs
 	collision_layer = 1
-	# Mask 6: Bit 2 (Dead Mobs/Walls) + Bit 3 (Hero) = 2 + 4 = 6
-	# Ensures living mobs collide with dead bodies and the Hero
-	collision_mask = 6
+	# Mask 1: World/Hero (as per requirements)
+	collision_mask = 1
 
 func _physics_process(_delta: float) -> void:
 	if is_dead:
@@ -40,7 +39,7 @@ func die() -> void:
 	is_dead = true
 
 	# Visual polish
-	modulate = Color.DIM_GRAY
+	modulate = Color.GRAY
 	z_index = -1
 
 	# Swap Collision Layer
