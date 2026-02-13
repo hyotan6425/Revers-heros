@@ -12,14 +12,10 @@ func _ready() -> void:
 
 	# Layer 1: Living Mobs
 	collision_layer = 1
-	# Mask 6: Bit 2 (Dead Mobs/Walls) + Bit 3 (Hero) = 2 + 4 = 6
-	# Ensures living mobs collide with dead bodies and the Hero
-	collision_mask = 6
+	# Mask 1: World/Hero (as per prompt requirements)
+	collision_mask = 1
 
 func _physics_process(_delta: float) -> void:
-	if is_dead:
-		return
-
 	# Move towards the target position
 	var direction = global_position.direction_to(target_position)
 	velocity = direction * speed
