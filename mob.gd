@@ -12,9 +12,8 @@ func _ready() -> void:
 
 	# Layer 1: Living Mobs
 	collision_layer = 1
-	# Mask 6: Bit 2 (Dead Mobs/Walls) + Bit 3 (Hero) = 2 + 4 = 6
-	# Ensures living mobs collide with dead bodies and the Hero
-	collision_mask = 6
+	# Mask 1: World/Hero (as per requirements)
+	collision_mask = 1
 
 func _physics_process(_delta: float) -> void:
 	if is_dead:
@@ -39,14 +38,15 @@ func take_damage(amount: int) -> void:
 func die() -> void:
 	is_dead = true
 
-	# Visual polish
+	# Visual polish: change sprite color to gray
 	modulate = Color.DIM_GRAY
+
+	# Optional: reduce z_index to be below living mobs
 	z_index = -1
 
 	# Swap Collision Layer
-	# Layer 2: Dead Mobs / Walls
+	# Dead: Collision Layer 2 (Wall/Obstacle), Mask 0 (None).
 	collision_layer = 2
-	# Mask 0: Static, doesn't collide with anything itself, but things collide with it
 	collision_mask = 0
 
 	# Stop physics processing so it becomes a static obstacle
