@@ -10,17 +10,12 @@ func _ready() -> void:
 	# Add to group "mobs" so Hero can find it
 	add_to_group("mobs")
 
-	# Layer 1: Living Mobs
+	# Alive: Collision Layer 1 (Mob), Mask 1 (World/Hero)
 	collision_layer = 1
-	# Mask 6: Bit 2 (Dead Mobs/Walls) + Bit 3 (Hero) = 2 + 4 = 6
-	# Ensures living mobs collide with dead bodies and the Hero
-	collision_mask = 6
+	collision_mask = 1
 
 func _physics_process(_delta: float) -> void:
-	if is_dead:
-		return
-
-	# Move towards the target position
+	# Simplified navigation: move directly towards target position
 	var direction = global_position.direction_to(target_position)
 	velocity = direction * speed
 	move_and_slide()
@@ -39,14 +34,14 @@ func take_damage(amount: int) -> void:
 func die() -> void:
 	is_dead = true
 
-	# Visual polish
+	# Change sprite color to indicate death
 	modulate = Color.DIM_GRAY
+
+	# Move to background to avoid drawing over living mobs
 	z_index = -1
 
-	# Swap Collision Layer
-	# Layer 2: Dead Mobs / Walls
+	# Dead: Collision Layer 2 (Wall/Obstacle), Mask 0 (None)
 	collision_layer = 2
-	# Mask 0: Static, doesn't collide with anything itself, but things collide with it
 	collision_mask = 0
 
 	# Stop physics processing so it becomes a static obstacle
