@@ -1,8 +1,10 @@
 extends CharacterBody2D
 
+# Stats
 @export var speed: float = 100.0
 @export var hp: int = 10
 
+# State
 var is_dead: bool = false
 var target_position: Vector2 = Vector2.ZERO
 
@@ -12,15 +14,11 @@ func _ready() -> void:
 
 	# Layer 1: Living Mobs
 	collision_layer = 1
-	# Mask 6: Bit 2 (Dead Mobs/Walls) + Bit 3 (Hero) = 2 + 4 = 6
-	# Ensures living mobs collide with dead bodies and the Hero
-	collision_mask = 6
+	# Mask 1: World/Hero (as requested)
+	collision_mask = 1
 
 func _physics_process(_delta: float) -> void:
-	if is_dead:
-		return
-
-	# Move towards the target position
+	# Move towards the target position using velocity and move_and_slide
 	var direction = global_position.direction_to(target_position)
 	velocity = direction * speed
 	move_and_slide()
@@ -33,21 +31,22 @@ func take_damage(amount: int) -> void:
 		return
 
 	hp -= amount
+	# Check for death
 	if hp <= 0:
 		die()
 
 func die() -> void:
+	# Critical: Do not queue_free(), but set state to dead
 	is_dead = true
 
-	# Visual polish
+	# Visual polish: Change color to gray
 	modulate = Color.DIM_GRAY
 	z_index = -1
 
-	# Swap Collision Layer
-	# Layer 2: Dead Mobs / Walls
+	# Swap Collision Layer: From Mob (1) to Wall/Obstacle (2)
 	collision_layer = 2
-	# Mask 0: Static, doesn't collide with anything itself, but things collide with it
+	# Mask 0: Collides with nothing (static obstacle)
 	collision_mask = 0
 
 	# Stop physics processing so it becomes a static obstacle
-	set_physics_process(false)
+	set_physics_process(false) # Ensure physics stops
