@@ -7,26 +7,29 @@ var is_dead: bool = false
 var target_position: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
-	# Add to group "mobs" so Hero can find it
 	add_to_group("mobs")
 
-	# Layer 1: Living Mobs
+	# Layer 1: Mob (Living)
 	collision_layer = 1
-	# Mask 6: Bit 2 (Dead Mobs/Walls) + Bit 3 (Hero) = 2 + 4 = 6
-	# Ensures living mobs collide with dead bodies and the Hero
+
+	# Mask 6: Layer 2 (Wall) + Layer 3 (Hero)
+	# Value = 2 + 4 = 6.
+	# NOTE: Prompt requested "Mask 1 (World/Hero)", but SETUP.md defines Hero as Layer 3
+	# and Wall as Layer 2. Mask 1 would only collide with other Mobs (Layer 1).
+	# Assuming intent is to collide with World/Hero, using mask 6.
 	collision_mask = 6
 
 func _physics_process(_delta: float) -> void:
 	if is_dead:
 		return
 
-	# Move towards the target position
+	# Simple navigation: move directly towards target
 	var direction = global_position.direction_to(target_position)
 	velocity = direction * speed
 	move_and_slide()
 
-func set_target(new_target: Vector2) -> void:
-	target_position = new_target
+func set_target(pos: Vector2) -> void:
+	target_position = pos
 
 func take_damage(amount: int) -> void:
 	if is_dead:
@@ -37,17 +40,18 @@ func take_damage(amount: int) -> void:
 		die()
 
 func die() -> void:
+	if is_dead:
+		return
+
 	is_dead = true
 
-	# Visual polish
+	# Visual indication of death
 	modulate = Color.DIM_GRAY
 	z_index = -1
 
-	# Swap Collision Layer
-	# Layer 2: Dead Mobs / Walls
-	collision_layer = 2
-	# Mask 0: Static, doesn't collide with anything itself, but things collide with it
-	collision_mask = 0
+	# Collision Layer Swap: Become a static obstacle (Wall)
+	collision_layer = 2 # Layer 2: Wall / Dead Mob
+	collision_mask = 0  # No mask, doesn't collide with anything proactively
 
-	# Stop physics processing so it becomes a static obstacle
+	# optimize performance by stopping physics processing
 	set_physics_process(false)
